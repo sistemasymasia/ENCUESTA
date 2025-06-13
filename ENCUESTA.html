@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Encuesta Construcción</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #fff;
+      color: #333;
+      line-height: 1.6;
+    }
+
+    header {
+      background-color: #00B140;
+      color: white;
+      padding: 1rem;
+      text-align: center;
+      border-bottom: 4px solid #ccc;
+    }
+
+    header h1 {
+      font-size: 1.5rem;
+      margin: 0.5rem auto;
+      max-width: 800px;
+    }
+
+    main {
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 1rem;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      padding: 2rem;
+    }
+
+    label {
+      display: block;
+      margin: 1rem 0 0.25rem;
+      font-weight: bold;
+    }
+
+    select, textarea {
+      width: 100%;
+      padding: 0.5rem;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      margin-bottom: 1rem;
+      font-size: 1rem;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    button {
+      background-color: #3399FF;
+      color: white;
+      border: none;
+      padding: 0.6rem 1.2rem;
+      font-size: 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .message {
+      margin-top: 1rem;
+      padding: 1rem;
+      border-radius: 8px;
+      background-color: #e0ffe0;
+      color: #006600;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    @media (max-width: 600px) {
+      main {
+        padding: 1rem 0.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Diagnóstico sobre Necesidades y Expectativas Laborales en la Industria de la Construcción:<br> Enfoque en las Nuevas Generaciones</h1>
+  </header>
+
+  <main>
+    <div class="card">
+      <form id="encuesta">
+        <p style="text-align: justify;">
+          Esta encuesta forma parte de una investigación sobre el riesgo de ruptura del modelo laboral tradicional en la industria de la construcción, ante la dificultad de integración de las nuevas generaciones. Tu participación es anónima y valiosa para comprender esta problemática y proponer soluciones que eviten una posible crisis estructural.
+        </p>
+
+        <input type="hidden" name="timestamp" id="timestamp" />
+
+        <label for="edad">Edad:</label>
+        <select name="edad" required>
+          <option value="">Seleccione una opción</option>
+          <option>Menos de 18 años</option>
+          <option>18 a 24 años</option>
+          <option>25 a 34 años</option>
+          <option>35 a 44 años</option>
+          <option>45 años o más</option>
+        </select>
+
+        <label for="sexo">Sexo:</label>
+        <select name="sexo" required>
+          <option value="">Seleccione una opción</option>
+          <option>Femenino</option>
+          <option>Masculino</option>
+          <option>Prefiero no decir</option>
+        </select>
+
+        <label for="rol">Indique su rol actual:</label>
+        <select name="rol" id="rol" required>
+          <option value="">Seleccione una opción</option>
+          <option>Empleadores responsables de contratar o liderar equipos en construcción.</option>
+          <option>Colaboradores actualmente activos en obras o proyectos del sector construcción.</option>
+          <option>Estudiantes universitarios de carreras relacionadas con la construcción, próximos a incorporarse a la vida laboral.</option>
+        </select>
+
+        <div id="preguntas"></div>
+
+        <button type="submit">Enviar</button>
+        <div id="mensaje" class="message hidden">✅ Datos enviados correctamente 🎉</div>
+      </form>
+    </div>
+  </main>
+
+  <script>
+    const form = document.getElementById("encuesta");
+    const rolSelect = document.getElementById("rol");
+    const preguntasDiv = document.getElementById("preguntas");
+    const mensaje = document.getElementById("mensaje");
+
+    const preguntas = {
+      "Empleadores responsables de contratar o liderar equipos en construcción.": [
+        "Busco jóvenes con disposición inmediata para integrarse al sector construcción.",
+        "Espero que los jóvenes lleguen con habilidades técnicas básicas ya desarrolladas.",
+        "Considero importante que los jóvenes estén abiertos a la movilidad geográfica.",
+        "Percibo que a los jóvenes les falta compromiso con la estabilidad laboral a largo plazo.",
+        "Busco jóvenes que valoren las oportunidades de aprendizaje ofrecidas.",
+        "Espero que los jóvenes se adapten a entornos laborales tradicionales.",
+        "Percibo resistencia de los jóvenes ante estructuras jerárquicas claras.",
+        "Considero que la movilidad geográfica debe ser vista como una oportunidad de crecimiento.",
+        "Espero que comprendan que el desarrollo profesional requiere tiempo y resultados.",
+        "Percibo que los jóvenes priorizan beneficios inmediatos sobre planes a largo plazo.",
+        "¿Qué barreras enfrentas al integrar jóvenes a tu equipo de trabajo?"
+      ],
+      "Colaboradores actualmente activos en obras o proyectos del sector construcción.": [
+        "Espero oportunidades claras de desarrollo profesional a mediano y largo plazo.",
+        "Busco equilibrio entre vida personal y laboral, aunque no siempre lo encuentro.",
+        "Valoro los programas de capacitación continua, pero percibo escasez.",
+        "Me gustaría que mis ideas sean tomadas en cuenta en decisiones de campo.",
+        "Deseo mayor uso de tecnología moderna en procesos constructivos.",
+        "Valoro incentivos económicos y reconocimientos al desempeño.",
+        "Espero líderes capacitados que motiven y guíen a sus equipos.",
+        "Considero importante la inclusión y diversidad en los equipos de trabajo.",
+        "Me gustaría mayor transparencia sobre rutas de crecimiento profesional.",
+        "Preferiría evitar traslados frecuentes entre proyectos, aunque el sector lo exige.",
+        "¿Qué te motiva a permanecer en una empresa constructora?"
+      ],
+      "Estudiantes universitarios de carreras relacionadas con la construcción, próximos a incorporarse a la vida laboral.": [
+        "Me interesa integrarme a proyectos con sentido social o ambiental.",
+        "Busco oportunidades de crecimiento profesional a largo plazo.",
+        "Valoro la posibilidad de horarios o modalidades flexibles.",
+        "Espero que las empresas utilicen tecnología moderna.",
+        "Deseo equilibrio entre vida personal y laboral.",
+        "Me gustaría recibir capacitación formal al ingresar a una empresa.",
+        "Quiero que se valoren mis ideas e iniciativas.",
+        "Prefiero empleos sin movilidad geográfica constante.",
+        "Aspiro a un entorno inclusivo y diverso.",
+        "Deseo estabilidad laboral a largo plazo.",
+        "¿Qué condiciones laborales te harían sentir motivado a trabajar en construcción?"
+      ]
+    };
+
+    const opciones = [
+      "Totalmente en desacuerdo",
+      "Desacuerdo",
+      "Neutral",
+      "De acuerdo",
+      "Totalmente de acuerdo"
+    ];
+
+    rolSelect.addEventListener("change", () => {
+      preguntasDiv.innerHTML = "";
+      const selected = rolSelect.value;
+      if (!selected) return;
+
+      preguntas[selected].forEach((pregunta, index) => {
+        const label = document.createElement("label");
+        label.textContent = pregunta;
+
+        const name = `p${index + 1}`;
+
+        if (pregunta.includes("?") && index === 10) {
+          const textarea = document.createElement("textarea");
+          textarea.name = name;
+          textarea.required = true;
+          preguntasDiv.appendChild(label);
+          preguntasDiv.appendChild(textarea);
+        } else {
+          const select = document.createElement("select");
+          select.name = name;
+          select.required = true;
+
+          const defaultOption = document.createElement("option");
+          defaultOption.value = "";
+          defaultOption.textContent = "Seleccione una opción";
+          select.appendChild(defaultOption);
+
+          opciones.forEach(op => {
+            const opt = document.createElement("option");
+            opt.value = op;
+            opt.textContent = op;
+            select.appendChild(opt);
+          });
+
+          preguntasDiv.appendChild(label);
+          preguntasDiv.appendChild(select);
+        }
+      });
+    });
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      document.getElementById("timestamp").value = new Date().toISOString();
+
+      const formData = new FormData(form);
+      try {
+        const response = await fetch("https://script.google.com/macros/s/AKfycbyFuWEXk1CiMLMz7ho7ac3gPnd_qJ6RotNa6DoLhla8dGHMy_r11a8AsbNgR5e7tGoh/exec", {
+          method: "POST",
+          body: formData
+        });
+
+        if (response.ok) {
+          form.reset();
+          preguntasDiv.innerHTML = "";
+          mensaje.classList.remove("hidden");
+          window.scrollTo({ top: 0, behavior: "smooth" });
+          setTimeout(() => mensaje.classList.add("hidden"), 5000);
+        } else {
+          alert("Hubo un error al enviar. Intenta nuevamente.");
+        }
+      } catch (error) {
+        alert("Error de conexión. Revisa tu red.");
+        console.error(error);
+      }
+    });
+  </script>
+</body>
+</html>
